@@ -14,9 +14,11 @@ const AnimatedShaderBackground = () => {
 
     const scene    = new THREE.Scene();
     const camera   = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    
+    // Disable antialiasing and reduce pixel ratio for better performance
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
 
     // Force canvas to fill container via CSS (Three.js sets pixel attrs, not CSS)
     const canvas = renderer.domElement;
@@ -41,7 +43,7 @@ const AnimatedShaderBackground = () => {
         uniform float iTime;
         uniform vec2  iResolution;
 
-        #define NUM_OCTAVES 3
+        #define NUM_OCTAVES 2
 
         float rand(vec2 n) {
           return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -61,7 +63,7 @@ const AnimatedShaderBackground = () => {
         float fbm(vec2 x) {
           float v = 0.0;
           float a = 0.3;
-          vec2  shift = vec2(100);
+          vec2  shift = vec2(100.0);
           mat2  rot   = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
           for (int i = 0; i < NUM_OCTAVES; ++i) {
             v += a * noise(x);
@@ -80,11 +82,12 @@ const AnimatedShaderBackground = () => {
 
           float f = 2.0 + fbm(p + vec2(iTime * 5.0, 0.0)) * 0.5;
 
-          for (float i = 0.0; i < 35.0; i++) {
+          // Reduced loop iterations from 35.0 to 12.0 for better performance
+          for (float i = 0.0; i < 12.0; i++) {
             v = p + cos(i * i + (iTime + p.x * 0.08) * 0.025 + i * vec2(13.0, 11.0)) * 3.5
               + vec2(sin(iTime * 3.0 + i) * 0.003, cos(iTime * 3.5 - i) * 0.003);
 
-            float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 35.0));
+            float tailNoise = fbm(v + vec2(iTime * 0.5, i)) * 0.3 * (1.0 - (i / 12.0));
 
             vec4 auroraColors = vec4(
               0.1 + 0.3 * sin(i * 0.2 + iTime * 0.4),
@@ -97,11 +100,12 @@ const AnimatedShaderBackground = () => {
               * exp(sin(i * i + iTime * 0.8))
               / length(max(v, vec2(v.x * f * 0.015, v.y * 1.5)));
 
-            float thin = smoothstep(0.0, 1.0, i / 35.0) * 0.6;
+            float thin = smoothstep(0.0, 1.0, i / 12.0) * 0.6;
             o += contribution * (1.0 + tailNoise * 0.8) * thin;
           }
 
-          o = tanh(pow(o / 100.0, vec4(1.6)));
+          // Adjusted the divisor since we have fewer iterations contributing to the total
+          o = tanh(pow(o / 30.0, vec4(1.6)));
           gl_FragColor = o * 1.5;
         }
       `,
@@ -112,9 +116,24 @@ const AnimatedShaderBackground = () => {
     scene.add(mesh);
 
     let frameId: number;
+    let isVisible = true;
+
+    // Use IntersectionObserver to pause the animation when the hero section is out of view
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      },
+      { threshold: 0 }
+    );
+    observer.observe(container);
+
     const animate = () => {
-      material.uniforms.iTime.value += 0.016;
-      renderer.render(scene, camera);
+      if (isVisible) {
+        material.uniforms.iTime.value += 0.016;
+        renderer.render(scene, camera);
+      }
       frameId = requestAnimationFrame(animate);
     };
     animate();
@@ -129,6 +148,7 @@ const AnimatedShaderBackground = () => {
 
     return () => {
       cancelAnimationFrame(frameId);
+      observer.disconnect();
       window.removeEventListener('resize', handleResize);
       if (container.contains(canvas)) container.removeChild(canvas);
       geometry.dispose();

@@ -17,7 +17,6 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-400">
           <a href="#work" className="hover:text-white transition-colors">Work</a>
           <a href="#services" className="hover:text-white transition-colors">Services</a>
-          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
         </div>
         <button className="bg-white text-black text-xs font-bold px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors uppercase tracking-wider">
           Get Started
@@ -99,43 +98,6 @@ const ServiceCard = ({ title, description, icon, list, color }: any) => {
   );
 };
 
-const PricingCard = ({ title, subtitle, features, price, isMain }: any) => {
-  return (
-    <div className={cn(
-      "rounded-3xl p-8 flex flex-col h-full transition-all duration-500",
-      isMain ? "bg-white text-black scale-105 z-10 shadow-2xl" : "bg-zinc-900 text-white border border-white/5"
-    )}>
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xl font-bold">{title}</h4>
-          {isMain && <span className="bg-zinc-100 text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-tighter">Popular</span>}
-        </div>
-        <p className={cn("text-xs", isMain ? "text-zinc-500" : "text-zinc-400")}>{subtitle}</p>
-      </div>
-
-      <ul className="space-y-4 mb-12 flex-grow">
-        {features.map((f: any, i: number) => (
-          <li key={i} className="flex items-start gap-3">
-            <div className={cn("w-1.5 h-1.5 rounded-full mt-1.5", isMain ? "bg-black" : "bg-white")} />
-            <span className="text-sm font-medium">{f}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-auto">
-        <div className="text-3xl font-bold mb-6">
-          {typeof price === 'number' ? `$${price}` : price}
-        </div>
-        <button className={cn(
-          "w-full py-4 rounded-full text-xs font-bold uppercase tracking-widest transition-all",
-          isMain ? "bg-black text-white hover:bg-zinc-800" : "bg-white text-black hover:bg-zinc-200"
-        )}>
-          Get This Package
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const FAQItem = ({ question, answer }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -410,42 +372,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-32 bg-black" id="pricing">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-20">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 font-bold mb-4 block">Pricing</span>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <PricingCard
-                title="Sprint"
-                subtitle="When your ass is on fire!"
-                features={['Base Identity', 'Logo, Typography, Color Palette, Graphic Elements', 'Zero Revisions']}
-                price={999}
-              />
-              <PricingCard
-                title="Start-Up"
-                subtitle="Start smart — go far."
-                features={['Base Identity', 'Landing Page', 'No-Code Development']}
-                price={2000}
-              />
-              <PricingCard
-                title="The Identity"
-                subtitle="All you (actually) need."
-                isMain
-                features={['Full Brand Identity', 'Extra Mockups, Advanced Guidelines', 'Landing Page', 'No-Code Development', 'Social Media Content', '3D Visuals', 'Motion Design']}
-                price={3000}
-              />
-              <PricingCard
-                title="Bombastic"
-                subtitle="Get it all."
-                features={['Full Brand Identity', 'Full Brandbook', 'Multipage Website', 'Custom Development', 'Social Media Content', 'Motion Design', '3D Visuals']}
-                price="6000+"
-              />
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section */}
         <section className="py-32 bg-zinc-950">
@@ -456,7 +382,7 @@ export default function App() {
             <div className="space-y-2">
               <FAQItem
                 question="How do we get started?"
-                answer="Pick a package — and we'll send you a quick form to fill out. It helps us build a clear brief. Then we hop on a call to talk through the details and get started."
+                answer="Reach out through our contact form. It helps us build a clear brief. Then we hop on a call to talk through the details and get started."
               />
               <FAQItem
                 question="I'm not sure what I need. Can we chat first?"
@@ -468,7 +394,7 @@ export default function App() {
               />
               <FAQItem
                 question="What about revisions?"
-                answer="Each package includes a set number of revision rounds. We work closely with you to ensure the final result exceeds your expectations."
+                answer="Every project includes a set number of revision rounds. We work closely with you to ensure the final result exceeds your expectations."
               />
             </div>
           </div>
@@ -498,16 +424,7 @@ export default function App() {
                   <input type="email" placeholder="your@email.com" className="w-full bg-transparent border-b border-white/20 py-4 focus:border-white outline-none transition-colors" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-zinc-600 font-bold">Package</label>
-                <select className="w-full bg-transparent border-b border-white/20 py-4 focus:border-white outline-none transition-colors appearance-none">
-                  <option className="bg-black">Select...</option>
-                  <option className="bg-black">Sprint</option>
-                  <option className="bg-black">Start-Up</option>
-                  <option className="bg-black">The Identity</option>
-                  <option className="bg-black">Bombastic</option>
-                </select>
-              </div>
+
               <button type="button" className="w-full bg-pink-200 text-black py-6 rounded-full font-bold uppercase tracking-widest hover:bg-pink-300 transition-colors mt-8">
                 Submit ✨
               </button>
